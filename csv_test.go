@@ -2,6 +2,7 @@ package microphones
 
 import (
 	. "github.com/franela/goblin"
+	"io/ioutil"
 	"reflect"
 	"testing"
 )
@@ -9,26 +10,22 @@ import (
 func Test(t *testing.T) {
 	g := Goblin(t)
 	g.Describe("Csv Files", func() {
-		mfr := MicrophoneFileReader{filename: "./data.csv"}
-		g.It("Be able to initialise a microphone file reader", func() {
-			g.Assert(mfr.filename).Equal("./data.csv")
-		})
-		g.It("Be able to read in all the contents of the data file", func() {
-			mfr.LoadMicrophones()
-			g.Assert(len(mfr.microphoneList)).Equal(1)
-		})
+		mfr := MicrophoneFileReader{}
+		csvfile, _ := ioutil.ReadFile("./data.csv")
+		data := string(csvfile)
 		g.It("Be able to retrieve a list of all the microphones", func() {
-			loaded, _ := mfr.LoadMicrophones()
+			loaded, _ := mfr.LoadMicrophones(data)
 			g.Assert(loaded).IsTrue("Microphones were not successfully loaded")
+			g.Assert(len(mfr.microphoneList)).Equal(1)
 			micList := mfr.GetMicrophones()
-			g.Assert(len(micList)).Equal(2)
+			g.Assert(len(micList)).Equal(1)
 			for i := 0; i < len(micList); i++ {
 				g.Assert(reflect.TypeOf(micList[i]).Name()).Equal("Microphone")
 				g.Assert(reflect.TypeOf(micList[i]).PkgPath()).Equal("github.com/settermjd/microphones")
 			}
 		})
 		g.It("Can retrieve the properties from a Microphone", func() {
-			mfr.LoadMicrophones()
+			mfr.LoadMicrophones(data)
 			micList := mfr.GetMicrophones()
 			micOne := micList[0]
 			g.Assert(len(micOne.name) != 0).IsTrue("Microphone name should be set")

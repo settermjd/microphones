@@ -2,8 +2,8 @@ package microphones
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"strconv"
 	"strings"
 )
@@ -13,15 +13,8 @@ type MicrophoneFileReader struct {
 	microphoneList []Microphone
 }
 
-func (mfr *MicrophoneFileReader) LoadMicrophones() (bool, error) {
-	data, err := ioutil.ReadFile(mfr.filename)
-	s := string(data)
-	r := csv.NewReader(strings.NewReader(s))
-	if err != nil {
-		fmt.Println(err)
-		return false, err
-	}
-
+func (mfr *MicrophoneFileReader) LoadMicrophones(data string) (bool, error) {
+	r := csv.NewReader(strings.NewReader(data))
 	records, err := r.ReadAll()
 
 	if err != nil {
@@ -30,7 +23,12 @@ func (mfr *MicrophoneFileReader) LoadMicrophones() (bool, error) {
 	}
 
 	for i := 0; i < len(records); i++ {
-		price, _ := strconv.ParseFloat(records[i][3], 64)
+		price, err := strconv.ParseFloat(records[i][3], 64)
+
+		if err != nil {
+			return false, errors.New("Not able to parse price to float")
+		}
+
 		mic := Microphone{
 			name:        records[i][0],
 			brand:       records[i][1],
