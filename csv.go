@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 type MicrophoneFileReader struct {
@@ -13,9 +12,8 @@ type MicrophoneFileReader struct {
 	microphoneList []Microphone
 }
 
-func (mfr *MicrophoneFileReader) LoadMicrophones(data string) (bool, error) {
-	r := csv.NewReader(strings.NewReader(data))
-	records, err := r.ReadAll()
+func (mfr *MicrophoneFileReader) LoadMicrophones(reader *csv.Reader) (bool, error) {
+	records, err := reader.ReadAll()
 
 	if err != nil {
 		fmt.Println(err)

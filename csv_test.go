@@ -1,9 +1,11 @@
 package microphones
 
 import (
+	"encoding/csv"
 	. "github.com/franela/goblin"
 	"io/ioutil"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -13,8 +15,9 @@ func Test(t *testing.T) {
 		mfr := MicrophoneFileReader{}
 		csvfile, _ := ioutil.ReadFile("./data.csv")
 		data := string(csvfile)
+		reader := csv.NewReader(strings.NewReader(data))
 		g.It("Be able to retrieve a list of all the microphones", func() {
-			loaded, _ := mfr.LoadMicrophones(data)
+			loaded, _ := mfr.LoadMicrophones(reader)
 			g.Assert(loaded).IsTrue("Microphones were not successfully loaded")
 			g.Assert(len(mfr.microphoneList)).Equal(1)
 			micList := mfr.GetMicrophones()
@@ -25,7 +28,7 @@ func Test(t *testing.T) {
 			}
 		})
 		g.It("Can retrieve the properties from a Microphone", func() {
-			mfr.LoadMicrophones(data)
+			mfr.LoadMicrophones(reader)
 			micList := mfr.GetMicrophones()
 			micOne := micList[0]
 			g.Assert(len(micOne.name) != 0).IsTrue("Microphone name should be set")
