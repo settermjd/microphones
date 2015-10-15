@@ -18,12 +18,13 @@ func Test(t *testing.T) {
 			g.Assert(len(mfr.microphoneList)).Equal(1)
 		})
 		g.It("Be able to retrieve a list of all the microphones", func() {
-			mfr.LoadMicrophones()
+			loaded, _ := mfr.LoadMicrophones()
+			g.Assert(loaded).IsTrue("Microphones were not successfully loaded")
 			micList := mfr.GetMicrophones()
 			g.Assert(len(micList)).Equal(2)
 			for i := 0; i < len(micList); i++ {
 				g.Assert(reflect.TypeOf(micList[i]).Name()).Equal("Microphone")
-				g.Assert(reflect.TypeOf(micList[i]).PkgPath()).Equal("github.com/settermjd/csvfiles")
+				g.Assert(reflect.TypeOf(micList[i]).PkgPath()).Equal("github.com/settermjd/microphones")
 			}
 		})
 		g.It("Can retrieve the properties from a Microphone", func() {

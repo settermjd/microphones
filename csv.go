@@ -13,32 +13,37 @@ type MicrophoneFileReader struct {
 	microphoneList []Microphone
 }
 
-func (mfr *MicrophoneFileReader) LoadMicrophones() {
+func (mfr *MicrophoneFileReader) LoadMicrophones() (bool, error) {
 	data, err := ioutil.ReadFile(mfr.filename)
 	s := string(data)
 	r := csv.NewReader(strings.NewReader(s))
 	if err != nil {
 		fmt.Println(err)
-	} else {
-		records, err := r.ReadAll()
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			for i := 0; i < len(records); i++ {
-				price, _ := strconv.ParseFloat(records[i][3], 64)
-				mic := Microphone{
-					name:        records[i][0],
-					brand:       records[i][1],
-					description: records[i][2],
-					price:       price,
-					url:         records[i][4],
-					micType:     records[i][5],
-					micStyle:    records[i][6],
-				}
-				mfr.microphoneList = append(mfr.microphoneList, mic)
-			}
-		}
+		return false, err
 	}
+
+	records, err := r.ReadAll()
+
+	if err != nil {
+		fmt.Println(err)
+		return false, err
+	}
+
+	for i := 0; i < len(records); i++ {
+		price, _ := strconv.ParseFloat(records[i][3], 64)
+		mic := Microphone{
+			name:        records[i][0],
+			brand:       records[i][1],
+			description: records[i][2],
+			price:       price,
+			url:         records[i][4],
+			micType:     records[i][5],
+			micStyle:    records[i][6],
+		}
+		mfr.microphoneList = append(mfr.microphoneList, mic)
+	}
+
+	return true, nil
 }
 
 func (mfr *MicrophoneFileReader) GetMicrophones() []Microphone {
